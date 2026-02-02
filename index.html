@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph-Based Disease Surveillance & Intervention System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Graph-Based Disease Surveillance & Intervention System</h1>
+            <p class="subtitle">Monitor, Predict, and Control Disease Spread</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Control Panel -->
+            <aside class="control-panel">
+                <div class="panel-section">
+                    <h2>System Controls</h2>
+                    
+                    <div class="control-group">
+                        <label for="numAreas">Number of Areas:</label>
+                        <input type="number" id="numAreas" value="20" min="5" max="100">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="peoplePerArea">People per Area:</label>
+                        <input type="number" id="peoplePerArea" value="10" min="5" max="50">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="initialInfected">Initial Infected:</label>
+                        <input type="number" id="initialInfected" value="5" min="1" max="50">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="diseaseModel">Disease Model:</label>
+                        <select id="diseaseModel">
+                            <option value="SIR">SIR (Susceptible-Infected-Recovered)</option>
+                            <option value="SEIR">SEIR (Susceptible-Exposed-Infected-Recovered)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="transmissionRate">Transmission Rate (β):</label>
+                        <input type="number" id="transmissionRate" value="0.3" min="0" max="1" step="0.01">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="recoveryRate">Recovery Rate (γ):</label>
+                        <input type="number" id="recoveryRate" value="0.1" min="0" max="1" step="0.01">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="incubationRate">Incubation Rate (σ) - SEIR only:</label>
+                        <input type="number" id="incubationRate" value="0.2" min="0" max="1" step="0.01" disabled>
+                    </div>
+
+                    <button id="generateGraph" class="btn btn-primary">Generate Graph</button>
+                    <button id="runSimulation" class="btn btn-primary">Run Simulation</button>
+                    <button id="resetSimulation" class="btn btn-secondary">Reset</button>
+                </div>
+
+                <div class="panel-section">
+                    <h2>Intervention Strategies</h2>
+                    
+                    <div class="control-group">
+                        <label for="vaccinationPercent">Vaccination Coverage (%):</label>
+                        <input type="number" id="vaccinationPercent" value="0" min="0" max="100" step="5">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="vaccinationStrategy">Vaccination Strategy:</label>
+                        <select id="vaccinationStrategy">
+                            <option value="random">Random</option>
+                            <option value="high-contact">High Contact Areas</option>
+                            <option value="centrality">High Centrality Areas</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="quarantineThreshold">Quarantine Threshold (neighboring infected):</label>
+                        <input type="number" id="quarantineThreshold" value="10" min="1" step="1">
+                    </div>
+
+                    <button id="applyInterventions" class="btn btn-success">Apply Interventions</button>
+                    <button id="contactTracing" class="btn btn-warning">Run Contact Tracing</button>
+                </div>
+
+                <div class="panel-section">
+                    <h2>Statistics</h2>
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <span class="stat-label">Susceptible:</span>
+                            <span id="statSusceptible" class="stat-value">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Exposed:</span>
+                            <span id="statExposed" class="stat-value">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Infected:</span>
+                            <span id="statInfected" class="stat-value">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Recovered:</span>
+                            <span id="statRecovered" class="stat-value">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Day:</span>
+                            <span id="statDay" class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Visualization Area -->
+            <main class="visualization-area">
+                <!-- Graph Section -->
+                <div class="graph-section">
+                    <h2>City Areas Network</h2>
+                    <div id="graphNetwork" class="graph-container"></div>
+                </div>
+
+                <!-- Timeline Section -->
+                <div class="timeline-section">
+                    <h2>Disease Spread Timeline</h2>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </main>
+
+            <!-- Analytics Panel -->
+            <aside class="analytics-panel">
+                <h2>Analytics</h2>
+                
+                <div class="analytics-section">
+                    <h3>Anomaly Detection</h3>
+                    <div id="anomalyAlerts" class="alerts-container"></div>
+                </div>
+
+                <div class="analytics-section">
+                    <h3>Intervention Effectiveness</h3>
+                    <canvas id="interventionChart"></canvas>
+                </div>
+
+                <div class="analytics-section">
+                    <h3>High-Risk Areas</h3>
+                    <div id="highRiskAreas" class="risk-nodes-container"></div>
+                </div>
+
+                <div class="analytics-section">
+                    <h3>Disease Metrics</h3>
+                    <div id="diseaseMetrics" class="metrics-container"></div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Alert Banner -->
+        <div id="alertBanner" class="alert-banner hidden">
+            <span id="alertMessage"></span>
+            <button id="closeAlert" class="close-btn">&times;</button>
+        </div>
+    </div>
+
+    <script src="graph.js"></script>
+    <script src="diseaseModel.js"></script>
+    <script src="anomalyDetection.js"></script>
+    <script src="interventions.js"></script>
+    <script src="dataGenerator.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
